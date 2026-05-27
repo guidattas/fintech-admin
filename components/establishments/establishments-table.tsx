@@ -24,7 +24,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsibleAvatar } from "@/components/establishments/responsible-avatar";
 import { StatusBadge } from "@/components/establishments/status-badge";
-import { formatCNPJ, formatCurrencyBRL } from "@/lib/utils";
+import { formatCNPJ, formatCurrencyBRL, formatDateBR } from "@/lib/utils";
 import type { EstablishmentSummary } from "@/lib/types/establishment";
 
 interface EstablishmentsTableProps {
@@ -46,31 +46,25 @@ export function EstablishmentsTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Estabelecimento</TableHead>
-              <TableHead>CNPJ</TableHead>
-              <TableHead>Contato</TableHead>
-              <TableHead>Faturamento mensal</TableHead>
+              <TableHead>Cadastro</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-12"> </TableHead>
+              <TableHead>Modalidade</TableHead>
+              <TableHead className="w-12 text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell>
+                  <Skeleton className="h-3 w-24" />
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-3 w-32" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
+                    <Skeleton className="h-3 w-32" />
                   </div>
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-3 w-32" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-3 w-40" />
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-3 w-24" />
@@ -79,7 +73,10 @@ export function EstablishmentsTable({
                   <Skeleton className="h-5 w-20 rounded-full" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="h-5 w-5" />
+                  <Skeleton className="h-3 w-32" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-5 w-5 ml-auto" />
                 </TableCell>
               </TableRow>
             ))}
@@ -94,11 +91,11 @@ export function EstablishmentsTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead>Estabelecimento</TableHead>
-            <TableHead>CNPJ</TableHead>
-            <TableHead>Contato</TableHead>
-            <TableHead>Faturamento mensal</TableHead>
+            <TableHead>Cadastro</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Modalidade</TableHead>
             <TableHead className="w-12 text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -109,6 +106,9 @@ export function EstablishmentsTable({
               className="cursor-pointer"
               onClick={() => router.push(`/estabelecimentos/${item.id}`)}
             >
+              <TableCell className="font-mono text-xs text-zinc-600">
+                {item.id.slice(0, 8)}...
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-3">
                   <ResponsibleAvatar name={item.brandName} />
@@ -121,25 +121,19 @@ export function EstablishmentsTable({
                       {item.brandName}
                     </Link>
                     <p className="truncate text-xs text-zinc-500">
-                      {item.companyName}
+                      {formatCNPJ(item.cnpj)}
                     </p>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-700">
-                {formatCNPJ(item.cnpj)}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col text-xs">
-                  <span className="text-zinc-700">{item.email}</span>
-                  <span className="text-zinc-500">{item.phone}</span>
-                </div>
-              </TableCell>
-              <TableCell className="font-medium text-zinc-900">
-                {formatCurrencyBRL(item.monthlyRevenue)}
+              <TableCell className="text-sm text-zinc-700">
+                {formatDateBR(item.createdAt)}
               </TableCell>
               <TableCell>
                 <StatusBadge status={item.status} />
+              </TableCell>
+              <TableCell className="text-sm text-zinc-700">
+                {item.companyType || '—'}
               </TableCell>
               <TableCell
                 className="text-right"
