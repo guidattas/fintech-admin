@@ -75,8 +75,18 @@ export interface LoginResponse {
 }
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    api.post<LoginResponse>("/auth/login", { email, password }),
+  // Mesmo fluxo do web: tenta login de representante (validado via Paytime API)
+  // e, se falhar, cai para o login de usuário comum.
+  login: async (email: string, password: string) => {
+    try {
+      return await api.post<LoginResponse>("/auth/login-representante", {
+        email,
+        password,
+      });
+    } catch {
+      return await api.post<LoginResponse>("/auth/login", { email, password });
+    }
+  },
 };
 
 export function extractErrorMessage(error: unknown, fallback = "Erro inesperado") {
@@ -94,7 +104,7 @@ export function extractErrorMessage(error: unknown, fallback = "Erro inesperado"
   return fallback;
 }
 
-// Marketplace API
+// Marketplace API — proxied pelo backend (JWT), credenciais Paytime ficam server-side
 export const marketplaceApi = {
   listEstablishments: (params?: {
     search?: string;
@@ -104,11 +114,6 @@ export const marketplaceApi = {
     sorters?: Array<{ column: string; direction: string }>;
   }) => {
     const config = {
-      headers: {
-        "integration-key":
-          process.env.NEXT_PUBLIC_INTEGRATION_KEY || "",
-        "x-token": process.env.NEXT_PUBLIC_X_TOKEN || "",
-      },
       params: {
         ...params,
         filters: params?.filters
@@ -119,17 +124,10 @@ export const marketplaceApi = {
           : undefined,
       },
     };
-    return api.get("/v1/marketplace/establishments", config);
+    return api.get("/paytime/establishments", config);
   },
 
   getEstablishment: (id: string | number) => {
-    const config = {
-      headers: {
-        "integration-key":
-          process.env.NEXT_PUBLIC_INTEGRATION_KEY || "",
-        "x-token": process.env.NEXT_PUBLIC_X_TOKEN || "",
-      },
-    };
-    return api.get(`/v1/marketplace/establishments/${id}`, config);
+    return api.get(`/paytime/establishments/${id}`);
   },
 };
