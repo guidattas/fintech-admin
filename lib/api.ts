@@ -40,6 +40,45 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Em caso de 401, limpa a sessão e redireciona para o login.
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (
+      error instanceof AxiosError &&
+      error.response?.status === 401 &&
+      typeof window !== "undefined" &&
+      window.location.pathname !== "/login"
+    ) {
+      setStoredToken(null);
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
+/**
+ * Sessão = token de login real salvo no localStorage.
+ * Não considera o NEXT_PUBLIC_DEV_TOKEN (conveniência de dev),
+ * para que o guard de rota sempre exija autenticação.
+ */
+export function hasSession(): boolean {
+  if (typeof window === "undefined") return false;
+  return !!window.localStorage.getItem(TOKEN_STORAGE_KEY);
+}
+
+export interface LoginResponse {
+  accessToken?: string;
+  token?: string;
+  refreshToken?: string;
+  user?: { id: string; name: string; email: string };
+}
+
+export const authApi = {
+  login: (email: string, password: string) =>
+    api.post<LoginResponse>("/auth/login", { email, password }),
+};
+
 export function extractErrorMessage(error: unknown, fallback = "Erro inesperado") {
   if (error instanceof AxiosError) {
     const data = error.response?.data as

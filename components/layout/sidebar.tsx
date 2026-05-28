@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Home,
@@ -20,10 +20,12 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Server,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { setStoredToken } from "@/lib/api";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   SidebarItem,
@@ -66,6 +68,12 @@ export function Sidebar({
   variant = "fixed",
 }: SidebarProps) {
   const pathname = usePathname() ?? "/";
+  const router = useRouter();
+
+  const handleLogout = () => {
+    setStoredToken(null);
+    router.replace("/login");
+  };
 
   const ToggleIcon: LucideIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
 
@@ -166,6 +174,20 @@ export function Sidebar({
               </motion.div>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            aria-label="Sair"
+            title="Sair"
+            className={cn(
+              "mt-2 inline-flex items-center gap-2 rounded-md text-sm text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60",
+              collapsed ? "h-9 w-9 justify-center" : "w-full px-2 py-1.5"
+            )}
+          >
+            <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
+            {!collapsed && <span>Sair</span>}
+          </button>
         </div>
       </motion.aside>
     </TooltipProvider>
