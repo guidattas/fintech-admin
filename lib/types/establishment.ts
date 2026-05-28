@@ -68,6 +68,8 @@ export interface EstablishmentSummary {
   monthlyRevenue: number;
   mcc: string;
   status: EstablishmentStatus;
+  credenciadoraNome?: string | null;
+  credenciadoraCnpj?: string | null;
   createdAt: string;
   updatedAt: string;
 }

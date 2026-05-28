@@ -638,6 +638,28 @@ export function EstablishmentDetail({ id }: EstablishmentDetailProps) {
             createdAt={establishment.createdAt}
             updatedAt={establishment.updatedAt}
           />
+
+          {establishment.credenciadoraCnpj || establishment.credenciadoraNome ? (
+            <Card>
+              <CardHeader className="pb-3">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">
+                  Credenciadora
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-1 text-sm">
+                {establishment.credenciadoraNome && (
+                  <p className="font-medium text-zinc-900">
+                    {establishment.credenciadoraNome}
+                  </p>
+                )}
+                {establishment.credenciadoraCnpj && (
+                  <p className="text-zinc-600">
+                    CNPJ {formatCNPJ(establishment.credenciadoraCnpj)}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ) : null}
         </aside>
       </div>
 
